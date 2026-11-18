@@ -128,7 +128,7 @@ Medidos em 17/11/2026, de uma máquina no Brasil contra `api-homolog.battlezone.
 
 p(95) por endpoint no load: `/auth/providers` 175 ms, `/status` 175 ms, `/tournaments/{id}` 234 ms, `/plans` 246 ms, `/players/ranking` 274 ms, `/tournaments` 374 ms (a listagem de 100 itens é a mais pesada).
 
-Com 10 usuários a mediana quase não mudou (180 → 185 ms) e o p(95) subiu 80 ms. A maior parte dos ~150 ms de piso é latência de rede até o servidor (`/status`, que não faz nada, já leva isso). Os thresholds (`http_req_failed < 1%`, `checks > 99%`, `p(95) < 1000 ms` no geral e por endpoint) foram calibrados a partir do smoke, com folga para a rede do runner do GitHub. Isso não é teste de capacidade: com o teto de 10 VUs ele mostra que a API aguenta uma concorrência pequena sem degradar, não onde ela quebra.
+Com 10 usuários a mediana quase não mudou (180 → 185 ms) e o p(95) subiu 80 ms. A maior parte dos ~150 ms de piso é latência de rede até o servidor (`/status`, que não faz nada, já leva isso). Os thresholds (`http_req_failed < 1%`, `checks > 99%`, `p(95) < 1000 ms` no geral e por endpoint) foram calibrados a partir do smoke, com folga para a rede do runner do GitHub. No smoke, que faz só 70 a 85 requisições, o limite de erro é 3% (e checks > 97%): uma única queda de conexão entre o runner e a Cloudflare, sem a requisição chegar à API, já passava de 1% e reprovava a execução. Isso não é teste de capacidade: com o teto de 10 VUs ele mostra que a API aguenta uma concorrência pequena sem degradar, não onde ela quebra.
 
 ## Achados na homologação
 
