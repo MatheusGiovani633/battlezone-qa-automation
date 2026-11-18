@@ -1,0 +1,50 @@
+name: k6
+
+on:
+  schedule:
+    - cron: '0 10 * * 1' # segunda-feira, 07:00 em Brasília: só o smoke
+  workflow_dispatch:
+    inputs:
+      test:
+        description: 'smoke (1 VU, 30 s) ou load (rampa até 10 VUs, ~3 min)'
+        type: choice
+        options: [smoke, load]
+        default: smoke
+
+permissions:
+  contents: read
+
+# Nunca duas cargas ao mesmo tempo: a homologação divide a máquina com a produção.
+concurrency:
+  group: k6
+  cancel-in-progress: false
+
+jobs:
+  k6:
+    name: k6 ${{ github.event_name == 'workflow_dispatch' && inputs.test || 'smoke' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      # O agendamento não tem input e cai no smoke: o load só roda à mão.
+      K6_TEST: ${{ github.event_name == 'workflow_dispatch' && inputs.test || 'smoke' }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: grafana/setup-k6-action@v1
+        with:
+          k6-version: '2.4.0'
+
+      - name: Rodar k6/${{ env.K6_TEST }}.js contra a homologação
+        run: k6 run k6/${K6_TEST}.js
+
+      - name: Resumo no job
+        if: ${{ !cancelled() }}
+        run: cat "k6/results/${K6_TEST}-summary.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Summary como artifact
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: k6-${{ env.K6_TEST }}-summary
+          path: k6/results/
+          retention-days: 30

@@ -1,0 +1,37 @@
+{
+  "name": "battlezone-qa-automation",
+  "version": "1.0.0",
+  "description": "Automação de testes (Playwright + k6) da homologação do BattleZone",
+  "scripts": {
+    "test": "playwright test",
+    "test:smoke": "playwright test --grep @smoke",
+    "test:regression": "playwright test --grep @regression",
+    "test:api": "playwright test --project=api --project=api-auth",
+    "test:e2e": "playwright test --project=chromium --project=mobile --project=chromium-auth",
+    "report": "playwright show-report",
+    "typecheck": "tsc --noEmit",
+    "k6:smoke": "k6 run k6/smoke.js",
+    "k6:load": "k6 run k6/load.js"
+  },
+  "keywords": [
+    "playwright",
+    "k6",
+    "qa",
+    "test-automation",
+    "e2e",
+    "api-testing"
+  ],
+  "author": "Matheus Giovani da Silva Pereira",
+  "license": "MIT",
+  "type": "commonjs",
+  "devDependencies": {
+    "@playwright/test": "^1.65.1",
+    "@types/node": "^26.6.6",
+    "ajv": "^8.20.0",
+    "typescript": "^7.0.2"
+  },
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  }
+}
